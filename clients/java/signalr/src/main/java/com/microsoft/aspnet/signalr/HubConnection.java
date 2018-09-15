@@ -276,18 +276,20 @@ public class HubConnection {
 
             InvocationRequest irq = new InvocationRequest(returnType);
             CompletableFuture<Object> pendingCall = irq.getPendingCall();
-            // forward the invocation result to the user
-            pendingCall.thenAcceptAsync((returnValue) -> {
-                // Primitive types can't be cast with the Class cast function
-                if (returnType.isPrimitive()) {
-                    future.complete((T)returnValue);
+            // forward the invocation result or error to the user
+            // run continuations on a separate thread
+            pendingCall.whenCompleteAsync((result, error) -> {
+                if (error == null) {
+                   // Primitive types can't be cast with the Class cast function
+                    if (returnType.isPrimitive()) {
+                        future.complete((T)result);
+                    } else {
+                        future.complete(returnType.cast(result));
+                    }
                 } else {
-                    future.complete(returnType.cast(returnValue));
+                    future.completeExceptionally(error);
                 }
             });
-
-            // forward any exceptions to the user
-            pendingCall.exceptionally((ex) -> future.completeExceptionally(ex));
 
             return irq;
         });

@@ -382,11 +382,10 @@ public class HubConnectionTest {
         assertFalse(result.isDone());
 
         mockTransport.receiveMessage("{\"type\":3,\"invocationId\":\"1\",\"error\":\"There was an error\"}" + RECORD_SEPARATOR);
-        assertTrue(result.isDone());
 
         String exceptionMessage = null;
         try {
-            result.get();
+            result.get(1000L, TimeUnit.MILLISECONDS);
             assertFalse(true);
         } catch (Exception ex) {
             exceptionMessage = ex.getMessage();
@@ -407,11 +406,10 @@ public class HubConnectionTest {
         assertFalse(result.isDone());
 
         hubConnection.stop();
-        assertTrue(result.isDone());
 
         boolean hasException = false;
         try {
-            result.get();
+            result.get(1000L, TimeUnit.MILLISECONDS);
             assertFalse(true);
         } catch (CancellationException ex) {
             hasException = true;

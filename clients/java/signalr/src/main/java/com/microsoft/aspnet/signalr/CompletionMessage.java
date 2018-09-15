@@ -4,7 +4,7 @@
 package com.microsoft.aspnet.signalr;
 
 class CompletionMessage extends HubMessage {
-    int type = HubMessageType.COMPLETION.value;
+    private int type = HubMessageType.COMPLETION.value;
     private String invocationId;
     private Object result;
     private String error;
@@ -33,6 +33,6 @@ class CompletionMessage extends HubMessage {
 
     @Override
     public HubMessageType getMessageType() {
-        return HubMessageType.COMPLETION;
+        return HubMessageType.values()[type - 1];
     }
 }
